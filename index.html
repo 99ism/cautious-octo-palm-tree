@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Garment Cutting</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            font-weight: bold;
+            color: #555;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+        h3 {
+            margin-top: 20px;
+            color: #333;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background-color: #f9f9f9;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .no-result {
+            text-align: center;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Kalkulator Garment Cutting</h2>
+        
+        <div class="input-group">
+            <label for="totalQty">Jumlah Produk yang Diinginkan</label>
+            <input type="number" id="totalQty" placeholder="Masukkan jumlah produk...">
+        </div>
+        
+        <div class="input-group">
+            <label for="minLays">Minimal Amparan</label>
+            <input type="number" id="minLays" placeholder="Masukkan amparan minimal...">
+        </div>
+        
+        <div class="input-group">
+            <label for="maxLays">Maksimal Amparan</label>
+            <input type="number" id="maxLays" placeholder="Masukkan amparan maksimal...">
+        </div>
+
+        <h3>Hasil Kombinasi:</h3>
+        <div id="resultContainer" class="result"></div>
+    </div>
+
+    <script>
+        // Tambahkan event listener ke setiap input untuk memicu kalkulasi secara otomatis
+        document.getElementById("totalQty").addEventListener("input", calculatePatternOptions);
+        document.getElementById("minLays").addEventListener("input", calculatePatternOptions);
+        document.getElementById("maxLays").addEventListener("input", calculatePatternOptions);
+
+        function calculatePatternOptions() {
+            const totalQty = parseInt(document.getElementById("totalQty").value);
+            const minLays = parseInt(document.getElementById("minLays").value);
+            const maxLays = parseInt(document.getElementById("maxLays").value);
+            const resultContainer = document.getElementById("resultContainer");
+            resultContainer.innerHTML = ""; // Hapus hasil sebelumnya
+
+            if (isNaN(totalQty) || totalQty <= 0 || isNaN(minLays) || minLays <= 0 || isNaN(maxLays) || maxLays <= 0 || minLays > maxLays) {
+                resultContainer.innerHTML = "<p class='no-result'>Masukkan angka yang valid dan pastikan minimal amparan tidak lebih besar dari maksimal amparan!</p>";
+                return;
+            }
+
+            // Persentase tambahan (0% hingga 3%)
+            const minQty = totalQty; // 0% tambahan
+            const maxQty = Math.floor(totalQty * 1.03); // 3% tambahan
+
+            // Judul untuk batas kuantitas
+            const rangeHeader = document.createElement("h4");
+            rangeHeader.textContent = `Target Produk antara ${minQty} hingga ${maxQty}`;
+            resultContainer.appendChild(rangeHeader);
+
+            const resultList = document.createElement("ul");
+            let foundCombination = false;
+
+            for (let patterns = 1; patterns <= maxQty; patterns++) {
+                const requiredLays = Math.ceil(minQty / patterns); // Minimum amparan untuk mendekati target minimum
+                const totalProducts = patterns * requiredLays;
+
+                // Memastikan hasil berada dalam rentang 0% hingga 3% dan sesuai dengan batasan amparan
+                if (requiredLays >= minLays && requiredLays <= maxLays && totalProducts >= minQty && totalProducts <= maxQty) {
+                    const listItem = document.createElement("li");
+                    listItem.textContent = `${patterns} gambar per ampar x ${requiredLays} ampar = ${totalProducts} produk`;
+                    resultList.appendChild(listItem);
+                    foundCombination = true;
+                }
+            }
+
+            if (!foundCombination) {
+                const noResult = document.createElement("p");
+                noResult.textContent = "Tidak ada kombinasi yang dapat memenuhi kriteria tersebut.";
+                noResult.classList.add("no-result");
+                resultContainer.appendChild(noResult);
+            } else {
+                resultContainer.appendChild(resultList);
+            }
+        }
+    </script>
+</body>
+</html>
